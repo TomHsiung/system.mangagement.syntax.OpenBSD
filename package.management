@@ -1,0 +1,11 @@
+# pkg_add(1) - for installing and updating packages
+pkg_add tshark
+
+# pkg_check(8) - for checking the consistency of installed packages
+pkg_check tshark
+
+# pkg_delete(1) - for removing installed packages
+pkg_delete tshark
+
+# pkg_info(1) - for displaying information about packages
+pkg_info tshark
