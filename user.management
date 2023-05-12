@@ -1,0 +1,2 @@
+# Creat a new user and the aossicated home directory
+useradd -m newusername
