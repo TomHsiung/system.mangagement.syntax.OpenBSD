@@ -1,0 +1,13 @@
+# Display a list of services and daemons matching lsarg, which can be one of:
+# all all services and daemons
+# failed enabled but stopped daemons
+# off disabled services and daemons
+# on enabled services and daemons
+# rogue daemons which are disabled but currently running
+# started running daemons
+# stopped stopped daemons
+rcctl ls started
+rcctl ls all
+
+# Display the value of service or daemon_variable.
+rcctl get service
