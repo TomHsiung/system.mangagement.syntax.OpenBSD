@@ -11,3 +11,21 @@ rcctl ls all
 
 # Display the value of service or daemon_variable.
 rcctl get service
+
+/* The output of rcctl get vnstatd displays the configuration settings for the vnstatd daemon in OpenBSD 7.3. Here's a breakdown of each line in the output:
+
+    vnstatd_class=daemon: This line indicates that the vnstatd daemon is classified as a daemon. It identifies the class to which the daemon belongs.
+
+    vnstatd_execdir=: This line specifies the execution directory for the vnstatd daemon. In this case, the value is empty, indicating that the default execution directory is used.
+
+    vnstatd_flags=: This line shows the flags or options that are set for the vnstatd daemon. Since the value is empty, it suggests that no specific flags are configured.
+
+    vnstatd_logger=: This line indicates the logger that is associated with the vnstatd daemon. The value is empty, suggesting that no specific logger is configured.
+
+    vnstatd_rtable=0: This line specifies the routing table ID used by the vnstatd daemon. In this case, the value is set to 0, which represents the default routing table.
+
+    vnstatd_timeout=30: This line defines the timeout value for the vnstatd daemon. The value is set to 30, indicating that the daemon will timeout if it does not receive any activity for 30 seconds.
+
+    vnstatd_user=_vnstat: This line specifies the user under which the vnstatd daemon runs. The value is set to _vnstat, indicating that the daemon runs with the _vnstat user privileges.
+
+These configuration settings determine how the vnstatd daemon operates on the system. You can modify these settings using the rcctl command with the appropriate subcommands, such as set or enable, to change the behavior of the vnstatd daemon based on your requirements. */
