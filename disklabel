@@ -1,0 +1,29 @@
+disklabel -h wd0 
+# /dev/rwd0c:
+type: ESDI
+disk: ESDI/IDE disk
+label: ST3500418AS     
+duid: 44c56f01c3c08575
+flags:
+bytes/sector: 512
+sectors/track: 63
+tracks/cylinder: 255
+sectors/cylinder: 16065
+cylinders: 60801
+total sectors: 976773168 # total bytes: 465.8G
+boundstart: 64
+boundend: 976773168
+
+16 partitions:
+#                size           offset  fstype [fsize bsize   cpg]
+  a:             1.0G               64  4.2BSD   2048 16384 12960 # /
+  b:             4.2G          2097216    swap                    # none
+  c:           465.8G                0  unused                    
+  d:             4.0G         10976704  4.2BSD   2048 16384 12960 # /tmp
+  e:            12.0G         19365312  4.2BSD   2048 16384 12960 # /var
+  f:            30.0G         44464320  4.2BSD   2048 16384 12960 # /usr
+  g:             1.0G        107378880  4.2BSD   2048 16384 12960 # /usr/X11R6
+  h:            20.0G        109476032  4.2BSD   2048 16384 12960 # /usr/local
+  i:             3.0G        151419072  4.2BSD   2048 16384 12960 # /usr/src
+  j:             6.0G        157710528  4.2BSD   2048 16384 12960 # /usr/obj
+  k:           300.0G        170293440  4.2BSD   4096 32768 26062 # /home
