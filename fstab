@@ -1,0 +1,28 @@
+# /etc/fstab
+# File system configurations
+
+# Syntax:
+# location of the partition, mount point, filesystem type, the mount options used for the file-system, whether dump(8) should back up this filesystem, pass number
+
+44c56f01c3c08575.b none swap sw
+44c56f01c3c08575.a / ffs rw 1 1
+44c56f01c3c08575.k /home ffs rw,nodev,nosuid 1 2
+44c56f01c3c08575.d /tmp ffs rw,nodev,nosuid 1 2
+44c56f01c3c08575.f /usr ffs rw,nodev 1 2
+44c56f01c3c08575.g /usr/X11R6 ffs rw,nodev 1 2
+44c56f01c3c08575.h /usr/local ffs rw,wxallowed,nodev 1 2
+44c56f01c3c08575.j /usr/obj ffs rw,nodev,nosuid 1 2
+44c56f01c3c08575.i /usr/src ffs rw,nodev,nosuid 1 2
+44c56f01c3c08575.e /var ffs rw,nodev,nosuid 1 2
+
+# ro The filesystem is mounted read-only. Not even root can write to it.
+# rw The filesystem is mounted read-write.
+# nodev Device nodes are not interpreted.
+# nosuid setuid files are forbidden.
+# noauto OpenBSD won’t automatically mount the filesystem at boot or when running mount -a. This option is useful for removable media drives that might not have media in them, such as CD and USB flash drives.
+
+/*
+The fifth field indicates whether dump(8) should back up this filesystem. If this field is 0 (or absent), dump doesn’t routinely back up the filesystem. Otherwise, the number given is the minimum dump level needed to back up the filesystem.
+
+The last field is the pass number. It tells fsck when to check the filesystem during boot. Filesystems with a pass number of 1 are checked first, filesystems with a pass number of 2 are checked second, and so on. A pass number of 0 tells fsck to not check the filesystem during boot. If a filesystem doesn’t have a pass number, it’s equivalent to 0.
+*/
