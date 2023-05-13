@@ -1,0 +1,105 @@
+#Examples:
+newfs /dev/rsd0a
+
+/*
+NAME
+
+newfs, mount_mfs — construct a new file system
+
+SYNOPSIS
+
+newfs	[-Nq] [-b block-size] [-c fragments-per-cylinder-group] [-e maxbpg] [-f frag-size] [-g avgfilesize] [-h avgfpdir] [-i bytes] [-m free-space] [-O filesystem-format] [-o optimization] [-S sector-size] [-s size] [-T disktype] [-t fstype] special
+
+mount_mfs	[-b block-size] [-c fragments-per-cylinder-group] [-e maxbpg] [-f frag-size] [-i bytes] [-m free-space] [-O filesystem-format] [-o options] [-P file] [-s size] special node
+DESCRIPTION
+
+Before running newfs, the disk must be labeled using disklabel(8). newfs builds a file system on the specified special device, basing its defaults on the information in the disk label. Typically the defaults are reasonable, although newfs has numerous options to allow the defaults to be selectively overridden.
+
+The special file should be a raw device, for example /dev/rsd0a; if a relative path like sd0a is specified, the corresponding raw device is used.
+
+mount_mfs is used to build a file system in virtual memory and then mount it on a specified node. mount_mfs exits and the contents of the file system are lost when the file system is unmounted. If mount_mfs is sent a signal while running, for example during system shutdown, it will attempt to unmount its corresponding file system. The parameters to mount_mfs are the same as those to newfs. The special file is only used to read the disk label which provides a set of configuration parameters for the memory based file system. The special file is typically that of the primary swap area, since that is where the file system will be backed up when free memory gets low and the memory supporting the file system has to be paged. If the keyword “swap” is used instead of a special file name, default configuration parameters will be used. (This option is useful when trying to use mount_mfs on a machine without any disks.)
+
+Both newfs and mount_mfs now have the functionality of fsirand(8) built in, so it is not necessary to run fsirand(8) manually unless you wish to re-randomize the file system (or list the inode generation numbers).
+
+The options to newfs are as follows:
+
+-b block-size
+The block size of the file system, in bytes. If a disklabel is available, the default is read from it. Otherwise the default is 16 KB or eight times the fragment size, whichever is smaller.
+
+-c fragments-per-cylinder-group
+The number of fragments per cylinder group in a file system. The default is to compute the maximum allowed by the other parameters. This value is dependent on a number of other parameters, in particular the block size and the number of bytes per inode.
+
+-e maxbpg
+This indicates the maximum number of blocks any single file can allocate out of a cylinder group before it is forced to begin allocating blocks from another cylinder group. The default is about one quarter of the total blocks in a cylinder group. See tunefs(8) for more details on how to set this option.
+
+-f frag-size
+The fragment size of the file system in bytes. If a disklabel is available, the default is read from it. Otherwise the default is 2048.
+
+-g avgfilesize
+The expected average file size for the file system in bytes.
+
+-h avgfpdir
+The expected average number of files per directory on the file system.
+
+-i bytes
+This specifies the density of inodes in the file system. The default is to create an inode for every 4 fragments, for 4k disks one inode for every 2 fragments. If fewer inodes are desired, a larger number should be used; to create more inodes a smaller number should be given.
+
+-m free-space
+The percentage of space reserved from normal users; the minimum free space threshold. The default value used is 5%. See tunefs(8) for more details on how to set this option.
+
+-N
+Causes the file system parameters to be printed out without really creating the file system.
+
+-O filesystem-format
+Select the filesystem format:
+0
+4.3BSD format file system. This option is primarily used to build root file systems that can be understood by older boot ROMs.
+1
+Fast File System (FFS), the default for mount_mfs.
+2
+Enhanced Fast File System (FFS2), the default for newfs.
+
+-o optimization
+space or time. The file system can either be instructed to try to minimize the time spent allocating blocks, or to try to minimize the space fragmentation on the disk. Unless an optimization has been specified, if the value of minfree (see above) is less than 5%, the default is to optimize for space; if the value of minfree is greater than or equal to 5%, the default is to optimize for time. See tunefs(8) for more details on how to set this option.
+
+-q
+Operate in quiet mode. With this option, newfs will not print extraneous information like superblock backups.
+
+-S sector-size
+The size of a sector in bytes (almost always 512). Alternatively sector-size may instead use a multiplier, as documented in scan_scaled(3). sector-size should be 512 or a multiple of it because the kernel operates 512-byte blocks internally. A sector is the smallest addressable unit on the physical device. Changing this is useful only when using newfs to build a file system whose raw image will eventually be used on a different type of disk than the one on which it is initially created (for example on a write-once disk). Note that changing this from its default will make it impossible for fsck(8) to find the alternate superblocks automatically if the standard superblock is lost.
+
+-s size
+The size of the file system in sectors (see -S). Alternatively size may instead use a multiplier, as documented in scan_scaled(3), to specify size in bytes; in this case size is rounded up to the next sector boundary. The maximum size of an FFS file system is 2,147,483,647 (2^31 - 1) of 512-byte blocks, slightly less than 1 TB. FFS2 file systems can be as large as 64 PB. Note however that for mount_mfs the practical limit is based on datasize in login.conf(5), and ultimately depends on the per-arch MAXDSIZ limit.
+
+-T disktype
+Uses information for the specified disk from disktab(5) instead of trying to get the information from the disklabel(5).
+
+-t fstype
+Set the file system type of which file system you wish to create. newfs will be smart enough to run the alternate newfs_XXX program instead.
+The options to mount_mfs are as described for newfs, except for the -o and -P options.
+
+Those options are as follows:
+
+-o options
+Options are specified with a -o flag followed by a comma separated string of options. See the mount(8) man page for possible options and their meanings.
+
+-P file
+If file is a directory, populate the created mfs file system with the contents of the directory. If file is a block device, populate the created mfs file system with the contents of the FFS file system contained on the device.
+If the -P file option is not used, the owner and mode of the created mfs file system will be the same as the owner and mode of the mount point.
+
+ENVIRONMENT
+
+COLUMNS
+If set to a positive integer, output is formatted to the given width in columns. Otherwise, newfs defaults to the terminal width, or 80 columns if the output is not a terminal.
+SEE ALSO
+
+disktab(5), fs(5), disklabel(8), dumpfs(8), fsck(8), fsirand(8), growfs(8), mount(8), tunefs(8)
+
+M. McKusick, W. Joy, S. Leffler, and R. Fabry, A Fast File System for UNIX, ACM Transactions on Computer Systems 2, 3, pp. 181–197, August 1984, (reprinted in the BSD System Manager's Manual).
+
+M. McKusick, M. Karels, and K. Bostic, A Pageable Memory Based Filesystem, USENIX Summer Conference Proceedings, 1990.
+
+HISTORY
+
+The newfs command appeared in 4.2BSD.
+*/
