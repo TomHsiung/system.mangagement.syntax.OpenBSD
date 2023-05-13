@@ -1,0 +1,17 @@
+/*
+OpenBSD’s filesystem, FFS, is an improved version of the filesystem shipped with BSD 4.4. FFS is sometimes called UFS (for Unix File System), and many system utilities still use UFS.
+
+Here are some key aspects of OpenBSD's FFS filesystem:
+
+UFS2: OpenBSD uses the UFS2 variant of FFS, which is an improved version of the original Unix File System (UFS). UFS2 offers numerous enhancements over its predecessor, including improved scalability, larger filesystem and file sizes, better performance, and support for extended file attributes.
+
+Journaling: FFS in OpenBSD employs soft updates, a journaling technique that helps maintain filesystem consistency in the event of power failures or system crashes. Soft updates use dependency tracking to ensure that data is written to disk in the correct order, reducing the likelihood of filesystem corruption.
+
+Snapshots: OpenBSD's FFS supports snapshot functionality, allowing administrators to create read-only copies of a filesystem at a specific point in time. Snapshots are useful for data backup, as they provide a consistent and point-in-time view of the filesystem, even while changes are being made.
+
+Soft dependencies: OpenBSD's FFS utilizes soft dependencies to improve performance. Soft dependencies relax the strict ordering of disk writes, allowing them to be reordered for performance gains while still maintaining the integrity of the filesystem.
+
+Soft updates: As mentioned earlier, FFS in OpenBSD utilizes soft updates, which eliminate the need for frequent synchronous writes to disk. This technique improves performance by delaying certain disk operations while maintaining the consistency and integrity of the filesystem.
+
+Filesystem checks: OpenBSD provides the fsck_ffs utility for checking and repairing FFS filesystems. It performs consistency checks, repairs minor errors, and ensures the integrity of the filesystem.
+*/
