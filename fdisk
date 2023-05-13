@@ -1,0 +1,166 @@
+NAME
+
+fdisk — partition table maintenance program
+
+SYNOPSIS
+
+fdisk	[-evy] [-A | -g | -i | -u] [-b blocks[@offset[:type]]] [-l blocks | -c cylinders -h heads -s sectors] [-f file] disk
+DESCRIPTION
+
+fdisk creates and edits MBR and GPT partition tables. These tables are used by the boot process of some platforms to find the OpenBSD kernel and, when present, are used by the kernel to find the disklabel(5).
+
+Caution is advised when editing these tables since some platforms rely on specific configurations created at install time.
+
+The options are as follows:
+
+-A
+Modifies the GPT partition table entries on disk to put all available space not taken by -b into a single OpenBSD partition. The available space is maximized by deleting all existing partition entries except for partition types APFS ISC, APFS, APFS Recovery, BIOS Boot, HiFive FSBL, HiFive BBL and partitions with the ‘Required’ GPT attribute set.
+If APFS ISC, APFS, or APFS Recovery partitions are detected then existing EFI system partitions are also preserved. If the preserved EFI system partition has fewer blocks than the number requested with -b, the modified GPT is discarded.
+
+-b blocks[@offset[:type]]
+Creates a partition table entry of the specified number of blocks, offset and type. offset defaults to the first available block, and type defaults to ‘EF’.
+-b is only available in combination with -A, -g, or -i.
+
+If -A or -g is specified, only the blocks value is used.
+
+-c cylinders -h heads -s sectors
+Specifies a geometry for fdisk to use. By default the disk size and geometry are obtained from the default disklabel(5) constructed by the kernel for disk. See disklabel(5) and disklabel(8).
+-e
+Invokes the interactive partition table editor. See COMMAND MODE below.
+-f file
+Specifies a file containing the bootcode for an MBR. The default file is /usr/mdec/mbr.
+-g
+Writes a default GPT, including a protective MBR, to disk. The GPT has a single OpenBSD partition containing all available space not taken by -b.
+-i
+Writes a default MBR to disk. The MBR has a single OpenBSD partition containing all the available space not taken by -b. The bootcode is initialized as described in -u.
+-l count
+Treat disk as though it has a size of count blocks.
+-u
+Updates the MBR bootcode. If a bootcode file is present (see -f) the MBR, except for the partition entries, is replaced by the first block of the file. If no bootcode file is present, zeros are used.
+Not available when editing a GPT.
+
+-v
+Prints detailed information about the MBR, the Primary GPT and the Secondary GPT.
+-y
+New or modified partition table is written to disk without asking for confirmation.
+disk
+fdisk creates or modifies the partition table of disk. disk can be a full pathname, e.g. /dev/rsd0c, a raw partition name, e.g. sd0c, or just the disk name, e.g. sd0.
+TYPICAL LAYOUT
+
+When called without options fdisk prints the partition table of disk.
+
+If disk has a GPT a terse version of its contents is printed:
+
+# fdisk sd0
+Disk: sd0       Usable LBA: 64 to 500118128 [500118192 Sectors]
+   #: type                                 [       start:         size ]
+------------------------------------------------------------------------
+   1: EFI Sys                              [          64:          960 ]
+   3: OpenBSD                              [        1024:    500117105 ]
+When disk does not have a GPT, the first block of disk is printed as an MBR:
+
+# fdisk sd0
+Disk: sd0      geometry: 121601/255/63 [1953525168 Sectors]
+Offset: 0      Signature: 0xAA55
+           Starting       Ending      LBA Info:
+ #: id     C  H  S -      C   H  S [     start:       size ]
+------------------------------------------------------------------------
+ 0: 0B     0  1  1 -  26108   0 63 [        63:  419425020 ] FAT32
+ 1: 00     0  0  0 -      0   0  0 [         0:          0 ] unused
+ 2: 00     0  0  0 -      0   0  0 [         0:          0 ] unused
+*3: A6 26108  1  1 - 121600 254 63 [ 419425083: 1534094982 ] OpenBSD
+NOTE: Partition entry #3 of this MBR is flagged as bootable.
+
+NOTE: The S field in the C/H/S values is “1 based”, but the LBA "start" field is “0 based”.
+
+The -v option causes more information to be printed:
+
+# fdisk -v sd0
+Primary GPT:
+Disk: sd0       Usable LBA: 64 to 500118128 [500118192 Sectors]
+GUID: f0418899-4976-4604-a783-3ebe135a8f12
+   #: type                                 [       start:         size ]
+      guid                                 name
+------------------------------------------------------------------------
+   1: EFI Sys                              [          64:          960 ]
+      d0834013-dab8-44df-a5e4-123148f17e03 EFI System Area
+   3: OpenBSD                              [        1024:    500117105 ]
+      cd356d77-8369-44b4-996e-79e8b9a47bfe OpenBSD Area
+
+Secondary GPT:
+Disk: sd0       Usable LBA: 64 to 500118128 [500118192 Sectors]
+GUID: f0418899-4976-4604-a783-3ebe135a8f12
+   #: type                                 [       start:         size ]
+      guid                                 name
+------------------------------------------------------------------------
+   1: EFI Sys                              [          64:          960 ]
+      d0834013-dab8-44df-a5e4-123148f17e03 EFI System Area
+   3: OpenBSD                              [        1024:    500117105 ]
+      cd356d77-8369-44b4-996e-79e8b9a47bfe OpenBSD Area
+
+MBR:
+Disk: sd0       geometry: 31130/255/63 [500118192 Sectors]
+Offset: 0       Signature: 0xAA55
+            Starting         Ending         LBA Info:
+ #: id      C   H   S -      C   H   S [       start:        size ]
+-------------------------------------------------------------------------------
+ 0: EE      0   0   2 -  31130 233  63 [           1:   500118191 ] EFI GPT
+ 1: 00      0   0   0 -      0   0   0 [           0:           0 ] unused
+ 2: 00      0   0   0 -      0   0   0 [           0:           0 ] unused
+ 3: 00      0   0   0 -      0   0   0 [           0:           0 ] unused
+COMMAND MODE
+
+When fdisk enters interactive command mode it copies the partition table from disk into memory and performs all edits on that copy. The partition table on disk is modified only by write or quit commands.
+
+The prompt contains information about the state of the edit process.
+
+disk*:1>
+Where disk is the name of the disk being edited, ‘*’ means that the partition table has been modified, but not yet written to disk and 1 is the edit level when operating on the MBR or GPT. This number is 2 when editing an extended partition in the MBR, 3 when editing an extended partition within the edit level 2 extended partition, and so on.
+
+The list of commands and their functions is given below. Commands may be abbreviated. The first command matching the abbreviation is selected.
+
+?
+A synonym for help.
+help
+Displays a short summary of available commands.
+manual
+Displays this manual page.
+reinit [gpt | mbr]
+Initializes the partition table.
+By default an MBR partition table is initialized. If gpt is specified a GPT partition table is initialized, including the protective MBR.
+
+setpid #
+Sets the identifier of the partition table entry.
+edit #
+Edit an entry in the partition table. The offset and size of the entry may be specified in CHS mode (MBR only), by using sector offsets and sizes, or by using the units ‘b’, ‘k’, ‘m’, ‘g’, or ‘t’ to indicate bytes, kilobytes, megabytes, gigabytes, or terabytes. The special size value ‘*’ causes the partition to be sized to use the remainder of the disk.
+flag # [value]
+Sets the partition entry's flag value. If value is not provided the partition entry is flagged as being bootable and all other partition entries are flagged as not bootable. Partition entries flagged as bootable are printed with a ‘*’ prefix.
+If value is provided the partition entry's flag value is set to value and no other partition entry is modified. A value of 0 is used to clear the bootable flag.
+
+update
+Updates the MBR bootcode. If a bootcode file is present (see -f) the MBR, except for the partition entries, is replaced by the first block of the file. If no bootcode file is present, zeros are used.
+Not available when editing a GPT.
+
+select #
+Selects an extended partition entry, increasing the edit level by 1.
+Not available when editing a GPT.
+
+swap # #
+Swaps two partition entries.
+print [unit]
+Prints the partition table. If unit is ‘b’, ‘k’, ‘m’, ‘g’, or ‘t’ partition sizes are shown in bytes, kilobytes, megabytes, gigabytes, or terabytes. If unit is not provided, sizes are shown in sectors.
+write
+Writes the partition table to disk.
+exit
+Discards outstanding changes and exits the current edit level. If the edit level is 1, fdisk terminates.
+quit
+Writes outstanding changes to disk and exits the current edit level. If the edit level is 1, fdisk terminates.
+abort
+Discards outstanding changes and terminates fdisk.
+FILES
+
+/usr/mdec/mbr
+default MBR bootcode
+SEE ALSO
+
+disklabel(5), boot(8), boot_amd64(8), boot_i386(8), boot_macppc(8), disklabel(8)
