@@ -1,0 +1,5 @@
+# To list how many disks you have:
+sysctl hw.diskcount
+
+# To list disk names:
+sysctl hw.disknames
